@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int            @id @default(autoincrement())
+  email          String         @unique
+  passwordHash   String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  username       String?
+  profilePicture String?
+  decks          Deck[]
+  refreshTokens  RefreshToken[]
+  //TODO: add refresh tokens
+}
+
+model Deck {
+  id          Int         @id @default(autoincrement())
+  title       String
+  description String?
+  flashcards  Flashcard[]
+  reviewedAt  DateTime    @default(now())
+  isDeleted   Int         @default(0)
+  userId      Int
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Flashcard {
+  id         Int       @id @default(autoincrement())
+  front      String
+  back       String
+  createdAt  DateTime  @default(now())
+  reviewedAt DateTime  @default(now())
+  tags       String?
+  confidence Int       @default(0)
+  dueDate    DateTime?
+  isDeleted  Int       @default(0)
+  deckId     Int
+  deck       Deck      @relation(fields: [deckId], references: [id], onDelete: Cascade)
+
+  @@index([deckId])
+}
+
+model RefreshToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  token     String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
