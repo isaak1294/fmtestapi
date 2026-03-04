@@ -27,7 +27,8 @@ app.use('/v1/auth', authRoutes);
 app.use('/v1/sync', syncRoutes);
 app.use('/v1/users', usersRoutes)
 
-app.listen(4000);
-console.log("server running on 4000")
+const PORT = process.env.PORT || 4000;
+app.listen(PORT);
+console.log(`server running on ${PORT}`)
 
 module.exports = app;
